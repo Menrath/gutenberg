@@ -16,7 +16,7 @@
 	},
 	"engines": {
 		"node": ">=20.10.0",
-		"npm": ">=10.2.3"
+		"pnpm": ">=10.4.0"
 	},
 	"wpPlugin": {
 		"name": "gutenberg",
@@ -312,8 +312,5 @@
 			"npm run lint:tsconfig"
 		]
 	},
-	"workspaces": [
-		"packages/*",
-		"routes/*"
-	]
+	"packageManager": "pnpm@10.4.0"
 }
