@@ -44,8 +44,8 @@
 	"wpScript": true,
 	"types": "build-types",
 	"dependencies": {
-		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/data": "file:../data"
+		"@wordpress/a11y": "workspace:../a11y",
+		"@wordpress/data": "workspace:../data"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

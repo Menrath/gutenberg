@@ -44,11 +44,11 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@wordpress/element": "file:../element",
+		"@wordpress/element": "workspace:../element",
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
-		"@wordpress/theme": "file:../theme"
+		"@wordpress/theme": "workspace:../theme"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
