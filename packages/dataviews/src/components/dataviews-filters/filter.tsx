@@ -17,7 +17,7 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
+import { useRef, useMemo } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { dateI18n, getDate } from '@wordpress/date';
 
@@ -191,13 +191,34 @@ export default function Filter( {
 
 	let activeElements: Option[] = [];
 
-	const { elements } = useElements( {
+	// Build include array from selected values for fetching their labels.
+	const includeValues = useMemo( () => {
+		if ( filterInView?.value === undefined ) {
+			return;
+		}
+		if ( filter.singleSelection ) {
+			return [ filterInView.value ];
+		}
+		if ( Array.isArray( filterInView.value ) ) {
+			return filterInView.value;
+		}
+		return [];
+	}, [ filterInView?.value, filter.singleSelection ] );
+
+	// Memoize query object to prevent infinite loops in useElements.
+	const includeQuery = useMemo( () => {
+		return includeValues?.length ? { include: includeValues } : undefined;
+	}, [ includeValues ] );
+
+	// Call 1: Fetch elements WITH include query for chip label display.
+	const { elements: selectedElements } = useElements( {
 		elements: filter.elements,
 		getElements: filter.getElements,
+		query: includeQuery,
 	} );
 
-	if ( elements.length > 0 ) {
-		activeElements = elements.filter( ( element ) => {
+	if ( selectedElements.length > 0 ) {
+		activeElements = selectedElements.filter( ( element ) => {
 			if ( filter.singleSelection ) {
 				return element.value === filterInView?.value;
 			}
@@ -347,7 +368,7 @@ export default function Filter( {
 								{ ...commonProps }
 								filter={ {
 									...commonProps.filter,
-									elements,
+									elements: commonProps.filter.elements ?? [],
 								} }
 							/>
 						) : (
