@@ -13,6 +13,10 @@
 - DataViews: Combined field alignment in table layout. [#73908](https://github.com/WordPress/gutenberg/pull/73908)
 - DataViews: Fix table row multiselection in Firefox [#73945](https://github.com/WordPress/gutenberg/pull/73945)
 
+### Breaking changes
+
+- Field API: `getElements` signature changed to support pagination and filtering. [#73623](https://github.com/WordPress/gutenberg/pull/73623)
+
 ### Enhancements
 
 - Better labels for operators and deprecate the `isNotAll` operator. [#73671](https://github.com/WordPress/gutenberg/pull/73671)
