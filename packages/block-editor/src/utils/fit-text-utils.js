@@ -23,6 +23,11 @@ function findOptimalFontSize( textElement, applyFontSize ) {
 	const range = document.createRange();
 	range.selectNodeContents( textElement );
 
+	const parentElement = textElement.parentElement;
+	const parentIsFlex =
+		window.getComputedStyle( parentElement ).display === 'flex';
+	const referenceElement = parentIsFlex ? parentElement : textElement;
+
 	while ( minSize <= maxSize ) {
 		const midSize = Math.floor( ( minSize + maxSize ) / 2 );
 		applyFontSize( midSize );
@@ -36,12 +41,14 @@ function findOptimalFontSize( textElement, applyFontSize ) {
 		// Check if text fits within the element's width and is not
 		// overflowing into the padding area.
 		const fitsWidth =
-			textElement.scrollWidth <= textElement.clientWidth &&
-			textWidth <= textElement.clientWidth - paddingLeft - paddingRight;
+			textElement.scrollWidth <= referenceElement.clientWidth &&
+			// textWidth <= textElement.parentElement.clientWidth &&
+			textWidth <=
+				referenceElement.clientWidth - paddingLeft - paddingRight;
 		// Check if text fits within the element's height.
 		const fitsHeight =
 			alreadyHasScrollableHeight ||
-			textElement.scrollHeight <= textElement.clientHeight;
+			textElement.scrollHeight <= referenceElement.clientHeight;
 
 		if ( fitsWidth && fitsHeight ) {
 			bestSize = midSize;
