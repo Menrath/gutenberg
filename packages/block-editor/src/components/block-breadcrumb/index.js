@@ -101,6 +101,7 @@ function BlockBreadcrumb( { rootLabelText } ) {
 						<BlockTitle
 							clientId={ parentClientId }
 							maximumLength={ 35 }
+							context="breadcrumb"
 						/>
 					</Button>
 					<Icon
@@ -114,7 +115,11 @@ function BlockBreadcrumb( { rootLabelText } ) {
 					className="block-editor-block-breadcrumb__current"
 					aria-current="true"
 				>
-					<BlockTitle clientId={ clientId } maximumLength={ 35 } />
+					<BlockTitle
+						clientId={ clientId }
+						maximumLength={ 35 }
+						context="breadcrumb"
+					/>
 				</li>
 			) }
 		</ul>
