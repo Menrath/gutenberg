@@ -430,7 +430,6 @@ class URLInput extends Component {
 			hideLabelFromVision = false,
 			help = null,
 			disabled = false,
-			onValidate,
 			customValidity,
 			markWhenOptional,
 		} = this.props;
@@ -479,11 +478,10 @@ class URLInput extends Component {
 		};
 
 		// Use ValidatedInputControl if validation props are provided
-		const useValidatedControl = onValidate || customValidity;
+		const useValidatedControl = !! customValidity;
 		const validationProps = useValidatedControl
 			? {
-					...( onValidate && { onValidate } ),
-					...( customValidity && { customValidity } ),
+					customValidity,
 					// Suppress the "(Required)" indicator in the label.
 					// The field is still required for validation, but the indicator
 					// can be hidden when markWhenOptional is set to true.
