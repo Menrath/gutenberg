@@ -98,6 +98,7 @@ function ListViewBlock( {
 		insertBeforeBlock,
 		setOpenedBlockSettingsMenu,
 		updateBlockAttributes,
+		stopEditingContentOnlySection,
 	} = unlock( useDispatch( blockEditorStore ) );
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
@@ -429,20 +430,50 @@ function ListViewBlock( {
 	}
 
 	const onMouseEnter = useCallback( () => {
+		// Disable hover for faded blocks in spotlight mode.
+		if ( shouldFadeInSpotlight ) {
+			return;
+		}
 		setIsHovered( true );
 		debouncedToggleBlockHighlight( clientId, true );
-	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
+	}, [
+		clientId,
+		setIsHovered,
+		debouncedToggleBlockHighlight,
+		shouldFadeInSpotlight,
+	] );
 	const onMouseLeave = useCallback( () => {
+		// Disable hover for faded blocks in spotlight mode.
+		if ( shouldFadeInSpotlight ) {
+			return;
+		}
 		setIsHovered( false );
 		debouncedToggleBlockHighlight( clientId, false );
-	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
+	}, [
+		clientId,
+		setIsHovered,
+		debouncedToggleBlockHighlight,
+		shouldFadeInSpotlight,
+	] );
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
+			// If we're in spotlight mode and clicking outside the edited section,
+			// exit spotlight mode instead of selecting the block.
+			if ( shouldFadeInSpotlight ) {
+				stopEditingContentOnlySection();
+				event.preventDefault();
+				return;
+			}
 			selectBlock( event, clientId );
 			event.preventDefault();
 		},
-		[ clientId, selectBlock ]
+		[
+			clientId,
+			selectBlock,
+			shouldFadeInSpotlight,
+			stopEditingContentOnlySection,
+		]
 	);
 
 	const updateFocusAndSelection = useCallback(
@@ -458,6 +489,12 @@ function ListViewBlock( {
 
 	const toggleExpanded = useCallback(
 		( event ) => {
+			// Prevent expanding/collapsing faded blocks in spotlight mode.
+			if ( shouldFadeInSpotlight ) {
+				event.preventDefault();
+				event.stopPropagation();
+				return;
+			}
 			// Prevent shift+click from opening link in a new window when toggling.
 			event.preventDefault();
 			event.stopPropagation();
@@ -467,7 +504,7 @@ function ListViewBlock( {
 				expand( clientId );
 			}
 		},
-		[ clientId, expand, collapse, isExpanded ]
+		[ clientId, expand, collapse, isExpanded, shouldFadeInSpotlight ]
 	);
 
 	// Allow right-clicking an item in the List View to open up the block settings dropdown.
