@@ -721,6 +721,10 @@ export function getInsertionPoint( state ) {
  * @return {boolean} Whether the block is hidden.
  */
 export const isBlockHidden = ( state, clientId ) => {
+	if ( ! window.__experimentalHideBlocksBasedOnScreenSize ) {
+		return false;
+	}
+
 	const blockName = getBlockName( state, clientId );
 	if ( ! hasBlockSupport( blockName, 'visibility', true ) ) {
 		return false;
@@ -760,6 +764,11 @@ export const isBlockHidden = ( state, clientId ) => {
  * @return {boolean} Whether the block has visibility restrictions.
  */
 export const isHiddenInAnyDevice = ( state, clientId ) => {
+	// Gate behind experimental flag
+	if ( ! window.__experimentalHideBlocksBasedOnScreenSize ) {
+		return false;
+	}
+
 	const blockName = getBlockName( state, clientId );
 	if ( ! hasBlockSupport( state, blockName, 'visibility', true ) ) {
 		return false;

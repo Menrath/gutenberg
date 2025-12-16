@@ -22,6 +22,9 @@ import {
  * @return {Object} Block visibility state and actions.
  */
 export default function useBlockVisibility( clientIds ) {
+	const isExperimentEnabled =
+		window.__experimentalHideBlocksBasedOnScreenSize === true;
+
 	const clientIdsArray = useMemo(
 		() => ( Array.isArray( clientIds ) ? clientIds : [ clientIds ] ),
 		[ clientIds ]
@@ -37,30 +40,38 @@ export default function useBlockVisibility( clientIds ) {
 
 			return {
 				blocks: _blocks,
-				canToggle: _blocks.every( ( { clientId } ) =>
-					hasBlockSupport(
-						getBlockName( clientId ),
-						'visibility',
-						true
-					)
-				),
+				canToggle:
+					isExperimentEnabled &&
+					_blocks.every( ( { clientId } ) =>
+						hasBlockSupport(
+							getBlockName( clientId ),
+							'visibility',
+							true
+						)
+					),
 				currentViewport: viewportType,
 			};
 		},
-		[ clientIdsArray ]
+		[ clientIdsArray, isExperimentEnabled ]
 	);
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	const isHidden = blocks.some( ( block ) =>
-		isHiddenForViewport(
-			block.attributes?.metadata?.blockVisibility,
-			currentViewport
-		)
-	);
-	const isHiddenInAnyDevice = blocks.some( ( block ) =>
-		hasAnyVisibilitySettings( block.attributes?.metadata?.blockVisibility )
-	);
+	const isHidden = isExperimentEnabled
+		? blocks.some( ( block ) =>
+				isHiddenForViewport(
+					block.attributes?.metadata?.blockVisibility,
+					currentViewport
+				)
+		  )
+		: false;
+	const isHiddenInAnyDevice = isExperimentEnabled
+		? blocks.some( ( block ) =>
+				hasAnyVisibilitySettings(
+					block.attributes?.metadata?.blockVisibility
+				)
+		  )
+		: false;
 
 	/**
 	 * Update visibility settings for the selected blocks.
@@ -68,6 +79,10 @@ export default function useBlockVisibility( clientIds ) {
 	 * @param {boolean|Object} visibility New visibility settings.
 	 */
 	const updateVisibility = ( visibility ) => {
+		if ( ! isExperimentEnabled ) {
+			return;
+		}
+
 		const attributesByClientId = Object.fromEntries(
 			blocks.map( ( { clientId, attributes } ) => [
 				clientId,
@@ -89,6 +104,10 @@ export default function useBlockVisibility( clientIds ) {
 	 * Toggle visibility on the current viewport.
 	 */
 	const toggleVisibility = () => {
+		if ( ! isExperimentEnabled ) {
+			return;
+		}
+
 		const attributesByClientId = Object.fromEntries(
 			blocks.map( ( { clientId, attributes } ) => {
 				const currentVisibility = attributes?.metadata?.blockVisibility;

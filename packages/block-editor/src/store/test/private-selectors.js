@@ -1152,6 +1152,238 @@ describe( 'private selectors', () => {
 	} );
 
 	describe( 'isBlockHidden', () => {
+		beforeAll( () => {
+			// Register a block with visibility support
+			registerBlockType( 'core/test-block-with-visibility', {
+				save: () => null,
+				category: 'text',
+				title: 'Test Block With Visibility',
+				supports: {
+					visibility: true,
+				},
+			} );
+
+			// Register a block without visibility support
+			registerBlockType( 'core/test-block-without-visibility', {
+				save: () => null,
+				category: 'text',
+				title: 'Test Block Without Visibility',
+				supports: {
+					visibility: false,
+				},
+			} );
+
+			// Register a block with no supports defined (defaults to true for visibility)
+			registerBlockType( 'core/test-block-default-visibility', {
+				save: () => null,
+				category: 'text',
+				title: 'Test Block Default Visibility',
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( 'core/test-block-with-visibility' );
+			unregisterBlockType( 'core/test-block-without-visibility' );
+			unregisterBlockType( 'core/test-block-default-visibility' );
+		} );
+
+		it( 'should return false when block has visibility support and is not hidden', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: true,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHidden( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should return true when block has visibility support and is hidden', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: false,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHidden( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'should return false when block does not have visibility support', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-without-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: false,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			// Even though blockVisibility is false, the block doesn't support visibility,
+			// so it should return false
+			expect( isBlockHidden( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should return false when block has default visibility support and is not hidden', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-default-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: true,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHidden( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should return true when block has default visibility support and is hidden', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-default-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: false,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHidden( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'should return false when block has no metadata', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [ [ 'block-1', {} ] ] ),
+				},
+			};
+
+			expect( isBlockHidden( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should return false when block has metadata but no blockVisibility property', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									someOtherProperty: 'value',
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHidden( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should handle non-existent block gracefully', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(),
+					attributes: new Map(),
+				},
+			};
+
+			// When block doesn't exist, getBlockName returns null,
+			// and hasBlockSupport should handle null gracefully
+			expect( isBlockHidden( state, 'non-existent-block' ) ).toBe(
+				false
+			);
+		} );
+	} );
+
+	describe( 'isBlockHidden in different devices', () => {
+		const originalExperimentalFlag =
+			window.__experimentalHideBlocksBasedOnScreenSize;
+
+		beforeEach( () => {
+			window.__experimentalHideBlocksBasedOnScreenSize = true;
+		} );
+
+		afterEach( () => {
+			window.__experimentalHideBlocksBasedOnScreenSize =
+				originalExperimentalFlag;
+		} );
+
 		const createState = ( blockVisibility, deviceType = 'Desktop' ) => ( {
 			settings: {
 				__experimentalDeviceType: deviceType,
@@ -1181,6 +1413,13 @@ describe( 'private selectors', () => {
 					],
 				] ),
 			},
+		} );
+
+		it( 'returns false when experimental flag is disabled', () => {
+			window.__experimentalHideBlocksBasedOnScreenSize = false;
+			const state = createState( false );
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( false );
 		} );
 
 		it( 'returns true when blockVisibility is false (hidden everywhere)', () => {
@@ -1233,6 +1472,18 @@ describe( 'private selectors', () => {
 	} );
 
 	describe( 'isHiddenInAnyDevice', () => {
+		const originalExperimentalFlag =
+			window.__experimentalHideBlocksBasedOnScreenSize;
+
+		beforeEach( () => {
+			window.__experimentalHideBlocksBasedOnScreenSize = true;
+		} );
+
+		afterEach( () => {
+			window.__experimentalHideBlocksBasedOnScreenSize =
+				originalExperimentalFlag;
+		} );
+
 		const createState = ( blockVisibility ) => ( {
 			settings: {},
 			blocks: {
@@ -1262,26 +1513,29 @@ describe( 'private selectors', () => {
 			},
 		} );
 
+		it( 'returns false when experimental flag is disabled', () => {
+			window.__experimentalHideBlocksBasedOnScreenSize = false;
+			const state = createState( false );
+			expect( isHiddenInAnyDevice( state, 'test-block' ) ).toBe( false );
+		} );
+
 		it( 'returns false for block without visibility support', () => {
+			// This test verifies that hasBlockSupport check works correctly
+			// Since hasBlockSupport is imported and used directly, we test the behavior
+			// by using a block type that doesn't support visibility
 			const state = {
 				settings: {},
 				blocks: {
 					byClientId: new Map( [
-						[ 'test-block', { name: 'core/paragraph' } ],
+						[ 'test-block', { name: 'core/html' } ],
 					] ),
 					attributes: new Map( [ [ 'test-block', {} ] ] ),
 				},
 			};
-			// Mock hasBlockSupport to return false
-			jest.spyOn(
-				require( '@wordpress/blocks' ),
-				'hasBlockSupport'
-			).mockReturnValue( false );
 
 			const result = isHiddenInAnyDevice( state, 'test-block' );
+			// Should return false because core/html doesn't support visibility
 			expect( result ).toBe( false );
-
-			jest.restoreAllMocks();
 		} );
 
 		it( 'returns true when blockVisibility is false', () => {

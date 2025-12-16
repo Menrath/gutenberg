@@ -194,7 +194,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				userPatternCategories: getUserPatternCategories(),
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
-				deviceType: getDeviceType(),
+				deviceType: window.__experimentalHideBlocksBasedOnScreenSize
+					? getDeviceType()
+					: undefined,
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -386,7 +388,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				'wp_block',
 				'wp_navigation',
 			].includes( postType ),
-			__experimentalDeviceType: deviceType,
+			...( window.__experimentalHideBlocksBasedOnScreenSize && deviceType
+				? { __experimentalDeviceType: deviceType }
+				: {} ),
 		};
 
 		return blockEditorSettings;

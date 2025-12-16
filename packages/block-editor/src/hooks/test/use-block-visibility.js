@@ -29,13 +29,21 @@ jest.mock( '../../store', () => ( {
 
 describe( 'useBlockVisibility', () => {
 	const mockUpdateBlockAttributes = jest.fn();
+	const originalExperimentalFlag =
+		window.__experimentalHideBlocksBasedOnScreenSize;
 
 	beforeEach( () => {
 		jest.clearAllMocks();
+		window.__experimentalHideBlocksBasedOnScreenSize = true;
 		hasBlockSupport.mockReturnValue( true );
 		useDispatch.mockImplementation( () => ( {
 			updateBlockAttributes: mockUpdateBlockAttributes,
 		} ) );
+	} );
+
+	afterEach( () => {
+		window.__experimentalHideBlocksBasedOnScreenSize =
+			originalExperimentalFlag;
 	} );
 
 	function setupUseSelectMock( overrides = {} ) {
@@ -322,5 +330,41 @@ describe( 'useBlockVisibility', () => {
 		const { result } = renderHook( () => useBlockVisibility( 'block-1' ) );
 
 		expect( result.current.visibilitySettings ).toBeNull();
+	} );
+
+	it( 'returns false for isHidden when experimental flag is disabled', () => {
+		window.__experimentalHideBlocksBasedOnScreenSize = false;
+		setupUseSelectMock( {
+			select: {
+				getBlocksByClientId: jest.fn( () => [
+					{
+						clientId: 'block-1',
+						attributes: {
+							metadata: {
+								blockVisibility: false,
+							},
+						},
+					},
+				] ),
+			},
+		} );
+
+		const { result } = renderHook( () => useBlockVisibility( 'block-1' ) );
+
+		expect( result.current.isHidden ).toBe( false );
+		expect( result.current.isHiddenInAnyDevice ).toBe( false );
+		expect( result.current.canToggle ).toBe( false );
+	} );
+
+	it( 'does not update visibility when experimental flag is disabled', () => {
+		window.__experimentalHideBlocksBasedOnScreenSize = false;
+		setupUseSelectMock();
+
+		const { result } = renderHook( () => useBlockVisibility( 'block-1' ) );
+
+		result.current.updateVisibility( { mobile: false } );
+		result.current.toggleVisibility();
+
+		expect( mockUpdateBlockAttributes ).not.toHaveBeenCalled();
 	} );
 } );
