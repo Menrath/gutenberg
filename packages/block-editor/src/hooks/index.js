@@ -97,3 +97,4 @@ export { setBackgroundStyleDefaults } from './background';
 export { useZoomOut } from './use-zoom-out';
 export { __unstableBlockStyleVariationOverridesWithConfig } from './block-style-variation';
 export { useStyleOverride } from './utils';
+export { default as useBlockVisibility } from './use-block-visibility';

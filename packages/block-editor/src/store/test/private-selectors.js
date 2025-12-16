@@ -20,6 +20,7 @@ import {
 	isRemoveLockedBlock,
 	isLockedBlock,
 	isBlockHidden,
+	isHiddenInAnyDevice,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 
@@ -1146,6 +1147,214 @@ describe( 'private selectors', () => {
 			// and hasBlockSupport should handle null gracefully
 			expect( isBlockHidden( state, 'non-existent-block' ) ).toBe(
 				false
+			);
+		} );
+	} );
+
+	describe( 'isBlockHidden', () => {
+		const createState = ( blockVisibility, deviceType = 'Desktop' ) => ( {
+			settings: {
+				__experimentalDeviceType: deviceType,
+			},
+			blocks: {
+				byClientId: new Map( [
+					[
+						'test-block',
+						{
+							name: 'core/paragraph',
+							attributes: {
+								metadata: {
+									blockVisibility,
+								},
+							},
+						},
+					],
+				] ),
+				attributes: new Map( [
+					[
+						'test-block',
+						{
+							metadata: {
+								blockVisibility,
+							},
+						},
+					],
+				] ),
+			},
+		} );
+
+		it( 'returns true when blockVisibility is false (hidden everywhere)', () => {
+			const state = createState( false );
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns false when blockVisibility is undefined', () => {
+			const state = createState( undefined );
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( false );
+		} );
+
+		it( 'returns false when Desktop is selected and block has breakpoint visibility', () => {
+			const state = createState(
+				{ mobile: false, tablet: true },
+				'Desktop'
+			);
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( false );
+		} );
+
+		it( 'returns true when Tablet is selected and block is hidden on tablet', () => {
+			const state = createState(
+				{ mobile: true, tablet: false },
+				'Tablet'
+			);
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns true when Mobile is selected and block is hidden on mobile', () => {
+			const state = createState(
+				{ mobile: false, tablet: true },
+				'Mobile'
+			);
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns false when Tablet is selected and block is visible on tablet', () => {
+			const state = createState(
+				{ mobile: false, tablet: true },
+				'Tablet'
+			);
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( false );
+		} );
+	} );
+
+	describe( 'isHiddenInAnyDevice', () => {
+		const createState = ( blockVisibility ) => ( {
+			settings: {},
+			blocks: {
+				byClientId: new Map( [
+					[
+						'test-block',
+						{
+							name: 'core/paragraph',
+							attributes: {
+								metadata: {
+									blockVisibility,
+								},
+							},
+						},
+					],
+				] ),
+				attributes: new Map( [
+					[
+						'test-block',
+						{
+							metadata: {
+								blockVisibility,
+							},
+						},
+					],
+				] ),
+			},
+		} );
+
+		it( 'returns false for block without visibility support', () => {
+			const state = {
+				settings: {},
+				blocks: {
+					byClientId: new Map( [
+						[ 'test-block', { name: 'core/paragraph' } ],
+					] ),
+					attributes: new Map( [ [ 'test-block', {} ] ] ),
+				},
+			};
+			// Mock hasBlockSupport to return false
+			jest.spyOn(
+				require( '@wordpress/blocks' ),
+				'hasBlockSupport'
+			).mockReturnValue( false );
+
+			const result = isHiddenInAnyDevice( state, 'test-block' );
+			expect( result ).toBe( false );
+
+			jest.restoreAllMocks();
+		} );
+
+		it( 'returns true when blockVisibility is false', () => {
+			const state = createState( false );
+			expect( isHiddenInAnyDevice( state, 'test-block' ) ).toBe( true );
+		} );
+
+		it( 'returns false when blockVisibility is undefined', () => {
+			const state = createState( undefined );
+			expect( isHiddenInAnyDevice( state, 'test-block' ) ).toBe( false );
+		} );
+
+		it( 'returns true when block is hidden on mobile', () => {
+			const state = createState( { mobile: false, tablet: true } );
+			expect( isHiddenInAnyDevice( state, 'test-block' ) ).toBe( true );
+		} );
+
+		it( 'returns true when block is hidden on tablet', () => {
+			const state = createState( { mobile: true, tablet: false } );
+			expect( isHiddenInAnyDevice( state, 'test-block' ) ).toBe( true );
+		} );
+
+		it( 'returns true when block is hidden on desktop', () => {
+			const state = createState( { mobile: true, desktop: false } );
+			expect( isHiddenInAnyDevice( state, 'test-block' ) ).toBe( true );
+		} );
+
+		it( 'returns false when block is visible on all devices', () => {
+			const state = createState( {
+				mobile: true,
+				tablet: true,
+				desktop: true,
+			} );
+			expect( isHiddenInAnyDevice( state, 'test-block' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getBlockVisibilitySettings', () => {
+		const createState = ( blockVisibility ) => ( {
+			settings: {},
+			blocks: {
+				attributes: new Map( [
+					[
+						'test-block',
+						{
+							metadata: {
+								blockVisibility,
+							},
+						},
+					],
+				] ),
+			},
+		} );
+
+		it( 'returns null when blockVisibility is not set', () => {
+			const state = createState( undefined );
+			expect( getBlockVisibilitySettings( state, 'test-block' ) ).toBe(
+				null
+			);
+		} );
+
+		it( 'returns false when blockVisibility is false', () => {
+			const state = createState( false );
+			expect( getBlockVisibilitySettings( state, 'test-block' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'returns object when blockVisibility is an object', () => {
+			const visibility = { mobile: false, tablet: true };
+			const state = createState( visibility );
+			expect( getBlockVisibilitySettings( state, 'test-block' ) ).toEqual(
+				visibility
 			);
 		} );
 	} );

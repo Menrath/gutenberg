@@ -612,7 +612,9 @@ function BlockListBlockProvider( props ) {
 				isPreviewMode,
 				__experimentalBlockBindingsSupportedAttributes,
 			} = getSettings();
-
+			const { isBlockHidden: _isBlockHidden } = unlock(
+				select( blockEditorStore )
+			);
 			const bindableAttributes =
 				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
 
@@ -633,8 +635,8 @@ function BlockListBlockProvider( props ) {
 					? getBlockDefaultClassName( blockName )
 					: undefined,
 				blockTitle: blockType?.title,
-				isBlockHidden: attributes?.metadata?.blockVisibility === false,
 				bindableAttributes,
+				isBlockHidden: _isBlockHidden( clientId ),
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -642,10 +644,6 @@ function BlockListBlockProvider( props ) {
 			if ( isPreviewMode ) {
 				return previewContext;
 			}
-
-			const { isBlockHidden: _isBlockHidden } = unlock(
-				select( blockEditorStore )
-			);
 			const _isSelected = isBlockSelected( clientId );
 			const canRemove = canRemoveBlock( clientId );
 			const canMove = canMoveBlock( clientId );
@@ -722,7 +720,6 @@ function BlockListBlockProvider( props ) {
 				originalBlockClientId: isInvalid
 					? blocksWithSameName[ 0 ]
 					: false,
-				isBlockHidden: _isBlockHidden( clientId ),
 			};
 		},
 		[ clientId, rootClientId ]
