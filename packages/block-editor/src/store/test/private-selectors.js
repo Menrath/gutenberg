@@ -1443,6 +1443,12 @@ describe( 'private selectors', () => {
 			expect( result ).toBe( false );
 		} );
 
+		it( 'returns true when Desktop is selected and block is hidden on desktop', () => {
+			const state = createState( { desktop: false }, 'Desktop' );
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
 		it( 'returns true when Tablet is selected and block is hidden on tablet', () => {
 			const state = createState(
 				{ mobile: true, tablet: false },
