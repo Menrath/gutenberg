@@ -23,6 +23,7 @@ import {
 	isHiddenInAnyDevice,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
+import { deviceTypeKey } from '../private-keys';
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -1386,7 +1387,7 @@ describe( 'private selectors', () => {
 
 		const createState = ( blockVisibility, deviceType = 'Desktop' ) => ( {
 			settings: {
-				__experimentalDeviceType: deviceType,
+				[ deviceTypeKey ]: deviceType,
 			},
 			blocks: {
 				byClientId: new Map( [
@@ -1415,9 +1416,16 @@ describe( 'private selectors', () => {
 			},
 		} );
 
-		it( 'returns false when experimental flag is disabled', () => {
+		it( 'returns true when blockVisibility is false even if experimental flag is disabled', () => {
 			window.__experimentalHideBlocksBasedOnScreenSize = false;
 			const state = createState( false );
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns false when experimental flag is disabled and block has breakpoint visibility', () => {
+			window.__experimentalHideBlocksBasedOnScreenSize = false;
+			const state = createState( { mobile: false, tablet: true } );
 			const result = isBlockHidden( state, 'test-block' );
 			expect( result ).toBe( false );
 		} );

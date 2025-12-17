@@ -98,6 +98,7 @@ const {
 	mediaEditKey,
 	getMediaSelectKey,
 	isIsolatedEditorKey,
+	deviceTypeKey,
 } = unlock( privateApis );
 
 /**
@@ -194,9 +195,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				userPatternCategories: getUserPatternCategories(),
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
-				deviceType: window.__experimentalHideBlocksBasedOnScreenSize
-					? getDeviceType()
-					: undefined,
+				deviceType: getDeviceType(),
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -389,7 +388,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				'wp_navigation',
 			].includes( postType ),
 			...( window.__experimentalHideBlocksBasedOnScreenSize && deviceType
-				? { __experimentalDeviceType: deviceType }
+				? { [ deviceTypeKey ]: deviceType }
 				: {} ),
 		};
 
