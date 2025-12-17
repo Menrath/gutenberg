@@ -635,8 +635,8 @@ function BlockListBlockProvider( props ) {
 					? getBlockDefaultClassName( blockName )
 					: undefined,
 				blockTitle: blockType?.title,
-				bindableAttributes,
 				isBlockHidden: _isBlockHidden( clientId ),
+				bindableAttributes,
 			};
 
 			// When in preview mode, we can avoid a lot of selection and

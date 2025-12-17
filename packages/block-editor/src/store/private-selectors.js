@@ -714,7 +714,6 @@ export function getInsertionPoint( state ) {
  * A block is considered hidden if:
  * - blockVisibility is false (hidden everywhere)
  * - blockVisibility is an object with the current device preview set to false
- *   (only when a device is explicitly selected via preview dropdown, not Desktop)
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the block.
