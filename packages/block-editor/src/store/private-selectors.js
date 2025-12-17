@@ -742,9 +742,8 @@ export const isBlockHidden = ( state, clientId ) => {
 	if ( typeof blockVisibility === 'object' && blockVisibility !== null ) {
 		const settings = getSettings( state );
 		const viewportType = settings.__experimentalDeviceType ?? 'Desktop';
-		// Only check breakpoint visibility when a device is explicitly selected
-		if ( viewportType !== 'Desktop' ) {
-			const viewportKey = viewportType.toLowerCase();
+		const viewportKey = viewportType.toLowerCase();
+		if ( Object.prototype.hasOwnProperty.call( blockVisibility, viewportKey ) ) {
 			return blockVisibility[ viewportKey ] === false;
 		}
 	}
