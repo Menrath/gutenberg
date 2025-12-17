@@ -200,6 +200,7 @@ describe( 'state', () => {
 	describe( 'blocks()', () => {
 		beforeAll( () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				save: noop,
 				edit: noop,
 				category: 'text',
@@ -214,12 +215,14 @@ describe( 'state', () => {
 		describe( 'replace inner blocks', () => {
 			beforeAll( () => {
 				registerBlockType( 'core/test-parent-block', {
+					apiVersion: 3,
 					save: noop,
 					edit: noop,
 					category: 'text',
 					title: 'test parent block',
 				} );
 				registerBlockType( 'core/test-child-block', {
+					apiVersion: 3,
 					save: noop,
 					edit: noop,
 					category: 'text',
