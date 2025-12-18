@@ -35,6 +35,7 @@ import blockHooks from './block-hooks';
 import blockBindingsPanel from './block-bindings';
 import './block-renaming';
 import './grid-visualizer';
+import autoInspectorControls from './auto-inspector-controls';
 
 createBlockEditFilter(
 	[
@@ -52,6 +53,7 @@ createBlockEditFilter(
 		blockBindingsPanel,
 		childLayout,
 		allowedBlocks,
+		autoInspectorControls,
 	].filter( Boolean )
 );
 createBlockListBlockFilter( [
