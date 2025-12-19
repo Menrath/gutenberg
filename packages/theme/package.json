@@ -39,7 +39,11 @@
 			"default": "./build/index.cjs"
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
-		"./design-tokens.js": "./src/prebuilt/js/design-tokens.js",
+		"./design-tokens.js": {
+			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
+			"import": "./build-module/prebuilt/js/design-tokens.js",
+			"default": "./build/prebuilt/js/design-tokens.cjs"
+		},
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
