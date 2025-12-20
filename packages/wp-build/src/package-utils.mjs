@@ -2,7 +2,8 @@
  * External dependencies
  */
 import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
+import path from 'path';
+import { findRootSync, DEFAULT_TOOLS } from '@manypkg/find-root';
 
 /**
  * Shared cache for package.json files to avoid redundant reads.
@@ -10,6 +11,41 @@ import { fileURLToPath } from 'url';
  */
 const packageJsonCache = new Map();
 const packagePathCache = new Map();
+
+/**
+ * Lazily initialized map of workspace packages.
+ * Maps package name to its directory path.
+ *
+ * @type {Map<string, string>|null}
+ */
+let workspacePackages = null;
+
+/**
+ * Get the workspace packages map, initializing it if necessary.
+ *
+ * @return {Map<string, string>} Map of package name to directory path.
+ */
+function getWorkspacePackagesMap() {
+	if ( workspacePackages === null ) {
+		workspacePackages = new Map();
+		const { tool: toolType, rootDir } = findRootSync( process.cwd() );
+		const tool = DEFAULT_TOOLS.find( ( t ) => t.type === toolType );
+
+		if ( ! tool ) {
+			throw new Error( `Could not find ${ toolType } tool` );
+		}
+
+		const { packages } = tool.getPackagesSync( rootDir );
+
+		for ( const pkg of packages ) {
+			// Only add packages that have a name field
+			if ( pkg.packageJson.name ) {
+				workspacePackages.set( pkg.packageJson.name, pkg.dir );
+			}
+		}
+	}
+	return workspacePackages;
+}
 
 /**
  * @typedef  {Object} PackageJson
@@ -41,8 +77,8 @@ const packagePathCache = new Map();
  */
 
 /**
- * Get package.json info using Node's module resolution.
- * Resolves the package using import.meta.resolve and reads its package.json.
+ * Get package.json info for a package.
+ * First checks workspace packages, then falls back to reading from the package directory.
  *
  * @param {string} fullPackageName The full package name (e.g., '@wordpress/blocks').
  * @return {PackageJson|null} Package.json object or null if not found.
@@ -52,8 +88,15 @@ export function getPackageInfo( fullPackageName ) {
 		return packageJsonCache.get( fullPackageName );
 	}
 
-	const resolved = import.meta.resolve( `${ fullPackageName }/package.json` );
-	const result = getPackageInfoFromFile( fileURLToPath( resolved ) );
+	const workspaceMap = getWorkspacePackagesMap();
+	const packageDir = workspaceMap.get( fullPackageName );
+
+	if ( ! packageDir ) {
+		return null;
+	}
+
+	const packageJsonPath = path.join( packageDir, 'package.json' );
+	const result = getPackageInfoFromFile( packageJsonPath );
 	packageJsonCache.set( fullPackageName, result );
 
 	return result;
