@@ -30,13 +30,9 @@ const meta: Meta< typeof Navigation > = {
 	id: 'components-navigation',
 	component: Navigation,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		NavigationBackButton,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		NavigationGroup,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		NavigationItem,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		NavigationMenu,
 	},
 	argTypes: {

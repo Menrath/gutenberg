@@ -17,7 +17,6 @@ const meta: Meta< typeof Dropdown > = {
 	title: 'Components/Overlays/Dropdown',
 	id: 'components-dropdown',
 	component: Dropdown,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { DropdownContentWrapper },
 	args: {
 		onClose: fn(),

@@ -45,7 +45,8 @@
 		"web-vitals": "^4.2.1"
 	},
 	"peerDependencies": {
-		"@playwright/test": ">=1"
+		"@playwright/test": ">=1",
+		"@types/node": "20.17.10"
 	},
 	"publishConfig": {
 		"access": "public"

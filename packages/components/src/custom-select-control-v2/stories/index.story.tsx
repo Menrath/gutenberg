@@ -19,7 +19,6 @@ const meta: Meta< typeof CustomSelectControlV2 > = {
 	id: 'components-customselectcontrol-v2',
 	component: CustomSelectControlV2,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CustomSelectControlV2.Item': CustomSelectControlV2.Item,
 	},
 	argTypes: {

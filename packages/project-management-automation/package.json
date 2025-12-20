@@ -35,6 +35,9 @@
 		"@octokit/request-error": "^2.1.0",
 		"@octokit/webhooks": "^9.26.3"
 	},
+	"devDependencies": {
+		"@types/node": "20.17.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

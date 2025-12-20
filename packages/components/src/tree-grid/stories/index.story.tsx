@@ -20,7 +20,6 @@ const meta: Meta< typeof TreeGrid > = {
 	title: 'Components/Navigation/TreeGrid',
 	id: 'components-treegrid',
 	component: TreeGrid,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { TreeGridRow, TreeGridCell },
 	argTypes: {
 		children: { control: false },

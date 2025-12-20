@@ -21,7 +21,6 @@ const meta: Meta< typeof Notice > = {
 	title: 'Components/Feedback/Notice',
 	id: 'components-notice',
 	component: Notice,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { NoticeList },
 	args: {
 		onDismiss: fn(),

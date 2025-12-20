@@ -21,7 +21,6 @@ const meta: Meta< typeof AlignmentMatrixControl > = {
 	title: 'Components/AlignmentMatrixControl',
 	component: AlignmentMatrixControl,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'AlignmentMatrixControl.Icon': AlignmentMatrixControl.Icon,
 	},
 	argTypes: {
