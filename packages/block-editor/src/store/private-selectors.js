@@ -790,19 +790,6 @@ export const isHiddenInAnyDevice = ( state, clientId ) => {
 };
 
 /**
- * Returns the block visibility settings from metadata.
- *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client ID of the block.
- *
- * @return {boolean|Object|null} The block visibility settings, or null if not set.
- */
-export const getBlockVisibilitySettings = ( state, clientId ) => {
-	const attributes = state.blocks.attributes.get( clientId );
-	return attributes?.metadata?.blockVisibility ?? null;
-};
-
-/**
  * Returns true if there is a spotlighted block.
  *
  * The spotlight is also active when a contentOnly section is being edited, the selector

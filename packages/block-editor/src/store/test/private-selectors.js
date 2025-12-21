@@ -1586,44 +1586,4 @@ describe( 'private selectors', () => {
 			expect( isHiddenInAnyDevice( state, 'test-block' ) ).toBe( false );
 		} );
 	} );
-
-	describe( 'getBlockVisibilitySettings', () => {
-		const createState = ( blockVisibility ) => ( {
-			settings: {},
-			blocks: {
-				attributes: new Map( [
-					[
-						'test-block',
-						{
-							metadata: {
-								blockVisibility,
-							},
-						},
-					],
-				] ),
-			},
-		} );
-
-		it( 'returns null when blockVisibility is not set', () => {
-			const state = createState( undefined );
-			expect( getBlockVisibilitySettings( state, 'test-block' ) ).toBe(
-				null
-			);
-		} );
-
-		it( 'returns false when blockVisibility is false', () => {
-			const state = createState( false );
-			expect( getBlockVisibilitySettings( state, 'test-block' ) ).toBe(
-				false
-			);
-		} );
-
-		it( 'returns object when blockVisibility is an object', () => {
-			const visibility = { mobile: false, tablet: true };
-			const state = createState( visibility );
-			expect( getBlockVisibilitySettings( state, 'test-block' ) ).toEqual(
-				visibility
-			);
-		} );
-	} );
 } );
