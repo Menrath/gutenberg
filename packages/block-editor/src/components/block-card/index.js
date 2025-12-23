@@ -111,8 +111,7 @@ function BlockCard( {
 			if ( ! clientId ) {
 				return { isBlockHidden: false, hasHiddenParent: false };
 			}
-			const { getBlockParents } = select( blockEditorStore );
-			const { isBlockHidden: _isBlockHidden } = unlock(
+			const { isBlockHidden: _isBlockHidden, getBlockParents } = unlock(
 				select( blockEditorStore )
 			);
 
@@ -224,7 +223,7 @@ function BlockCard( {
 							<HStack spacing={ 2 } justify="start">
 								<Icon icon={ unseen } />
 								<Text>
-									{ hasHiddenParent
+									{ hasHiddenParent && ! isBlockHidden
 										? __( 'Parent block is hidden' )
 										: __( 'Block is hidden' ) }
 								</Text>
