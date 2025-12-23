@@ -55,9 +55,9 @@ export default function BlockVisibilityInfo( { clientId } ) {
 			<HStack spacing={ 2 } justify="start">
 				<Icon icon={ unseen } />
 				<Text>
-					{ hasHiddenParent && ! isBlockHidden
-						? __( 'Parent block is hidden' )
-						: __( 'Block is hidden' ) }
+					{ isBlockHidden
+						? __( 'Block is hidden' )
+						: __( 'Parent block is hidden' ) }
 				</Text>
 			</HStack>
 		</Notice>
